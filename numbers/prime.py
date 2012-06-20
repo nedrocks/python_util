@@ -38,6 +38,9 @@ def prime_generator():
             yield next_prime
         num_primes += 1
 
+# Maps a number to a list of prime factors
+_prime_factor_cache = dict()
+
 def prime_factors(n):
     """Finds prime factors of a given number.
 
@@ -47,16 +50,21 @@ def prime_factors(n):
     Returns:
         List containing prime factors.
     """
-    prime_list = list()
-    for p in prime_generator():
-        if p > n/2:
-            break
-        prime_list.append(p)
     factors = list()
-    for p in prime_list:
-        while not n % p:
+    if n == 1:
+        return factors
+
+    if n in _prime_factor_cache:
+        return _prime_factor_cache[n]
+
+    halfN = n << 1
+    for p in prime_generator():
+        if not n % p:
             factors.append(p)
-            n /= p
+            factors.extend(prime_factors(n / p))
+            break
+
+    _prime_factor_cache[n] = factors
     return factors
 
 def num_divisors(n):
